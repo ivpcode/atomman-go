@@ -33,29 +33,80 @@ The display communicates over USB serial using a proprietary tile-based protocol
 
 ---
 
-## Quick Install
+## Installation
 
 ```bash
 git clone https://github.com/ivpcode/atomman-go.git
 cd atomman-go
-bash install.sh
+bash scripts/install.sh
 ```
 
-`install.sh` builds the binary, copies it to `/opt/atomman-go/`, and creates and starts the `atomman-go` systemd service.
+`install.sh` builds the binary, copies it to `/opt/atomman-go/`, adds your user to the `dialout` group, and creates and starts the `atomman-go` systemd service.
 
-### Useful commands
+> **Note:** You may need to log out and back in for the `dialout` group change to take effect.
+
+---
+
+## Service Management
+
+### Status
 
 ```bash
-sudo systemctl status atomman-go       # service status
-journalctl -u atomman-go -f            # live logs
-sudo systemctl restart atomman-go      # restart after config changes
+sudo systemctl status atomman-go
 ```
+
+### Start / Stop / Restart
+
+```bash
+sudo systemctl start atomman-go
+sudo systemctl stop atomman-go
+sudo systemctl restart atomman-go
+```
+
+### Enable / Disable autostart at boot
+
+```bash
+sudo systemctl enable atomman-go    # start automatically on boot (set by install.sh)
+sudo systemctl disable atomman-go   # do not start at boot
+```
+
+### Live logs
+
+```bash
+journalctl -u atomman-go -f
+```
+
+### View last 50 log lines
+
+```bash
+journalctl -u atomman-go -n 50 --no-pager
+```
+
+---
+
+## Update after code changes
+
+```bash
+bash scripts/update.sh
+```
+
+Rebuilds the binary and restarts the service without touching the installed config.
+
+---
+
+## Uninstall
+
+```bash
+bash scripts/uninstall.sh
+```
+
+Stops and disables the service, removes the service file and `/opt/atomman-go/`.
 
 ---
 
 ## Configuration
 
-Edit `/opt/atomman-go/config.yaml` (or `config.yaml` in the source directory before installing):
+Edit `/opt/atomman-go/config.yaml` (installed copy) or `config.yaml` in the source directory before running `install.sh`:
 
 ```yaml
 serial:
@@ -90,7 +141,7 @@ network:
   interface: ""           # empty = auto-detect
 ```
 
-After any change:
+After editing the installed config:
 ```bash
 sudo systemctl restart atomman-go
 ```
@@ -104,7 +155,6 @@ sudo systemctl restart atomman-go
 ./atomman --dashboard --start-delay 3
 
 # Available flags
-./atomman --help
   -config string       path to YAML config (default "config.yaml")
   -port string         serial port (overrides config)
   -start-delay float   startup delay in seconds
@@ -130,7 +180,10 @@ atomman-go/
 ├── weather.go     # OpenWeatherMap integration (optional)
 ├── config.go      # Config struct + YAML loader
 ├── config.yaml    # user configuration
-└── install.sh     # build + systemd service installer
+└── scripts/
+    ├── install.sh   # build + install systemd service
+    ├── update.sh    # rebuild and redeploy binary
+    └── uninstall.sh # stop service and remove all files
 ```
 
 ---
@@ -140,7 +193,7 @@ atomman-go/
 The display identifies as `0416:50a1 Winbond Electronics Corp. USB Virtual COM` on `/dev/ttyACM0`.
 
 ```
-Display → Host  (ENQ):    AA 05 <seq> CC 33 C3 3C
+Display → Host  (ENQ):     AA 05 <seq> CC 33 C3 3C
 Host    → Display (reply): AA <tileID> 00 <seq> <ASCII payload> CC 33 C3 3C
 ```
 
