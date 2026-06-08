@@ -1,0 +1,72 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# AtomMan Go — Configurazione display secondario AtomMan X7 Ti
+# Modifica questo file per personalizzare cosa mostra il displayino.
+# ─────────────────────────────────────────────────────────────────────────────
+
+serial:
+  port: /dev/ttyACM0          # porta rilevata (USB Virtual COM Winbond 0416:50a1)
+  baud: 115200
+  start_delay: 5.0            # secondi di attesa dopo apertura porta (aumenta se non parte)
+  dsrdtr: true
+  rtscts: false
+
+# ─── Tile in rotazione ────────────────────────────────────────────────────────
+# Definisce QUALI tile mostrare e in CHE ORDINE.
+# Commenta (con #) le righe delle tile che non vuoi vedere.
+# Disponibili: cpu, gpu, memory, disk, datetime, network, volume, battery
+tiles:
+  - cpu
+  - gpu
+  - memory
+  - disk
+  - datetime
+  - network
+  - volume
+  # - battery   # solo su laptop; su desktop mostra sempre 100%
+
+# ─── Etichette personalizzate ─────────────────────────────────────────────────
+# Sovrascrivono il nome rilevato automaticamente in ogni tile.
+# Lascia vuoto ("") per usare il rilevamento automatico.
+# Esempi pratici:
+#   cpu:    "Core Ultra 9 185H"
+#   gpu:    "Intel Arc / Iris Xe"
+#   memory: "DDR5 5600"
+#   disk:   "Samsung 990 Pro 2TB"
+custom_labels:
+  cpu:    ""
+  gpu:    ""
+  memory: ""
+  disk:   ""
+
+# ─── Meteo (opzionale) ────────────────────────────────────────────────────────
+# Richiede chiave API OpenWeather gratuita: https://openweathermap.org/api
+# Con api_key vuota il tile data/ora funziona comunque (senza icona meteo).
+weather:
+  api_key:  ""                 # es: "abcdef1234567890abcdef1234567890"
+  location: "Rome,IT"          # città, "lat,lon" o "CAP,country"
+  units:    metric             # metric (°C) o imperial (°F)
+  lang:     it                 # lingua descrizione meteo
+  refresh_seconds: 600         # aggiorna ogni 10 minuti
+
+# ─── Ventola ──────────────────────────────────────────────────────────────────
+fan:
+  prefer:  auto    # auto (hwmon poi NVIDIA) | hwmon | nvidia
+  max_rpm: 2000    # solo NVIDIA: RPM = percentuale * max_rpm / 100
+
+# ─── Rete ─────────────────────────────────────────────────────────────────────
+network:
+  interface: ""    # vuoto = auto-detect (preferisce LAN cablata)
+                   # esempio: "eth0" o "enp3s0" per forzare un'interfaccia
+
+# ─── Unlock display ───────────────────────────────────────────────────────────
+# Se il display non si attiva, aumenta window_seconds o start_delay.
+unlock:
+  attempts:       3
+  window_seconds: 5.0
+
+# ─── Dashboard terminale ──────────────────────────────────────────────────────
+# Attiva con --dashboard da linea di comando, oppure imposta enabled: true qui.
+dashboard:
+  enabled:        false
+  no_color:       false
+  refresh_millis: 500
